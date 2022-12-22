@@ -1,9 +1,15 @@
 import { useSelector, useDispatch } from "react-redux";
-import { toggle } from "../redux/todos/todosSlice";
+import { toggle, destroy } from "../redux/todos/todosSlice";
 
 export default function TodoList() {
   const dispatch = useDispatch();
   const items = useSelector((state) => state.todos.items);
+
+  const handleDestroy = (id) => {
+    if (window.confirm("Are you sure?")) {
+      dispatch(destroy(id));
+    }
+  };
 
   return (
     <ul className="todo-list">
@@ -14,10 +20,13 @@ export default function TodoList() {
               className="toggle"
               type="checkbox"
               checked={item.completed}
-              onChange={() => dispatch(toggle(item))}
+              onChange={() => dispatch(toggle({ id: item.id }))}
             />
             <label>{item.title}</label>
-            <button className="destroy"></button>
+            <button
+              className="destroy"
+              onClick={() => handleDestroy(item.id)}
+            ></button>
           </div>
         </li>
       ))}
