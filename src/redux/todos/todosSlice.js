@@ -8,7 +8,12 @@ const todosSlice = createSlice({
       { id: "2", title: "Read a book", completed: false }
     ]
   },
-  reducers: {}
+  reducers: {
+    addTodo: (state, action) => {
+      state.items.push(action.payload);
+    }
+  }
 });
 
+export const { addTodo } = todosSlice.actions;
 export default todosSlice.reducer;
