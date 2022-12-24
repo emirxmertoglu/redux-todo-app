@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { nanoid } from "@reduxjs/toolkit";
 import { addTodo } from "../redux/todos/todosSlice";
 
 export default function Form() {
@@ -14,9 +13,7 @@ export default function Form() {
 
     dispatch(
       addTodo({
-        id: nanoid(),
-        title,
-        completed: false
+        title
       })
     );
 
