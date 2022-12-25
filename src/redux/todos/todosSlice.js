@@ -1,13 +1,21 @@
-import { createSlice, nanoid } from "@reduxjs/toolkit";
+import { createSlice, nanoid, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+
+export const getTodosAsync = createAsyncThunk(
+  "todos/getTodosAsync",
+  async () => {
+    const res = await axios("https://slycyh-7000.preview.csb.app/todos");
+    return res.data;
+  }
+);
 
 const todosSlice = createSlice({
   name: "todos",
   initialState: {
-    items: [
-      { id: "1", title: "Learn Redux", completed: true },
-      { id: "2", title: "Read a book", completed: false }
-    ],
-    activeFilter: "all"
+    items: [],
+    activeFilter: "all",
+    isLoading: false,
+    error: null
   },
   reducers: {
     addTodo: {
@@ -41,6 +49,19 @@ const todosSlice = createSlice({
       const filtered = state.items.filter((item) => item.completed === false);
       state.items = filtered;
     }
+  },
+  extraReducers: (builder) => {
+    builder.addCase(getTodosAsync.pending, (state) => {
+      state.isLoading = true;
+    });
+    builder.addCase(getTodosAsync.fulfilled, (state, action) => {
+      state.items = action.payload;
+      state.isLoading = false;
+    });
+    builder.addCase(getTodosAsync.rejected, (state, action) => {
+      state.error = action.error.message;
+      state.isLoading = false;
+    });
   }
 });
 
