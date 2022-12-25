@@ -1,4 +1,4 @@
-import { createSlice, nanoid, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 export const getTodosAsync = createAsyncThunk(
@@ -9,29 +9,28 @@ export const getTodosAsync = createAsyncThunk(
   }
 );
 
+export const addTodoAsync = createAsyncThunk(
+  "todos/addTodoAsync",
+  async (data) => {
+    const res = await axios.post(
+      "https://slycyh-7000.preview.csb.app/todos",
+      data
+    );
+    return res.data;
+  }
+);
+
 const todosSlice = createSlice({
   name: "todos",
   initialState: {
     items: [],
     activeFilter: "all",
     isLoading: false,
-    error: null
+    error: null,
+    addNewTodoIsLoading: false,
+    addNewTodoError: null
   },
   reducers: {
-    addTodo: {
-      reducer: (state, action) => {
-        state.items.push(action.payload);
-      },
-      prepare: ({ title }) => {
-        return {
-          payload: {
-            id: nanoid(),
-            title,
-            completed: false
-          }
-        };
-      }
-    },
     toggle: (state, action) => {
       const { id } = action.payload;
       const item = state.items.find((item) => item.id === id);
@@ -51,6 +50,7 @@ const todosSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
+    // get todos
     builder.addCase(getTodosAsync.pending, (state) => {
       state.isLoading = true;
     });
@@ -61,6 +61,19 @@ const todosSlice = createSlice({
     builder.addCase(getTodosAsync.rejected, (state, action) => {
       state.error = action.error.message;
       state.isLoading = false;
+    });
+
+    // add todo
+    builder.addCase(addTodoAsync.pending, (state) => {
+      state.addNewTodoIsLoading = true;
+    });
+    builder.addCase(addTodoAsync.fulfilled, (state, action) => {
+      state.items.push(action.payload);
+      state.addNewTodoIsLoading = false;
+    });
+    builder.addCase(addTodoAsync.rejected, (state, action) => {
+      state.addNewTodoError = action.error.message;
+      state.addNewTodoIsLoading = false;
     });
   }
 });
@@ -80,7 +93,6 @@ export const selectFilteredTodos = (state) => {
 export const selectActiveFilter = (state) => state.todos.activeFilter;
 
 export const {
-  addTodo,
   toggle,
   destroy,
   changeActiveFilter,
