@@ -2,10 +2,10 @@ import { useEffect } from "react";
 
 import { useSelector, useDispatch } from "react-redux";
 import {
-  destroy,
   selectFilteredTodos,
   getTodosAsync,
-  toggleTodoAsync
+  toggleTodoAsync,
+  removeTodoAsync
 } from "../redux/todos/todosSlice";
 
 import Loading from "./Loading";
@@ -23,7 +23,7 @@ export default function TodoList() {
 
   const handleDestroy = (id) => {
     if (window.confirm("Are you sure?")) {
-      dispatch(destroy(id));
+      dispatch(removeTodoAsync(id));
     }
   };
 
