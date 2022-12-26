@@ -1,10 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
+axios.defaults.baseURL = "https://slycyh-7000.preview.csb.app";
+
 export const getTodosAsync = createAsyncThunk(
   "todos/getTodosAsync",
   async () => {
-    const res = await axios("https://slycyh-7000.preview.csb.app/todos");
+    const res = await axios("/todos");
     return res.data;
   }
 );
@@ -12,10 +14,15 @@ export const getTodosAsync = createAsyncThunk(
 export const addTodoAsync = createAsyncThunk(
   "todos/addTodoAsync",
   async (data) => {
-    const res = await axios.post(
-      "https://slycyh-7000.preview.csb.app/todos",
-      data
-    );
+    const res = await axios.post("/todos", data);
+    return res.data;
+  }
+);
+
+export const toggleTodoAsync = createAsyncThunk(
+  "todos/toggleTodoAsync",
+  async ({ id, data }) => {
+    const res = await axios.patch(`/todos/${id}`, data);
     return res.data;
   }
 );
@@ -31,11 +38,6 @@ const todosSlice = createSlice({
     addNewTodoError: null
   },
   reducers: {
-    toggle: (state, action) => {
-      const { id } = action.payload;
-      const item = state.items.find((item) => item.id === id);
-      item.completed = !item.completed;
-    },
     destroy: (state, action) => {
       const id = action.payload;
       const filtered = state.items.filter((item) => item.id !== id);
@@ -75,6 +77,13 @@ const todosSlice = createSlice({
       state.addNewTodoError = action.error.message;
       state.addNewTodoIsLoading = false;
     });
+
+    // toggle todo
+    builder.addCase(toggleTodoAsync.fulfilled, (state, action) => {
+      const { id, completed } = action.payload;
+      const item = state.items.find((item) => item.id === id);
+      item.completed = completed;
+    });
   }
 });
 
@@ -93,7 +102,6 @@ export const selectFilteredTodos = (state) => {
 export const selectActiveFilter = (state) => state.todos.activeFilter;
 
 export const {
-  toggle,
   destroy,
   changeActiveFilter,
   clearCompleted

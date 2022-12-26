@@ -2,10 +2,10 @@ import { useEffect } from "react";
 
 import { useSelector, useDispatch } from "react-redux";
 import {
-  toggle,
   destroy,
   selectFilteredTodos,
-  getTodosAsync
+  getTodosAsync,
+  toggleTodoAsync
 } from "../redux/todos/todosSlice";
 
 import Loading from "./Loading";
@@ -27,6 +27,10 @@ export default function TodoList() {
     }
   };
 
+  const handleToggle = (id, completed) => {
+    dispatch(toggleTodoAsync({ id, data: { completed } }));
+  };
+
   if (isLoading) {
     return <Loading />;
   }
@@ -44,7 +48,7 @@ export default function TodoList() {
               className="toggle"
               type="checkbox"
               checked={item.completed}
-              onChange={() => dispatch(toggle({ id: item.id }))}
+              onChange={() => handleToggle(item.id, !item.completed)}
             />
             <label>{item.title}</label>
             <button
