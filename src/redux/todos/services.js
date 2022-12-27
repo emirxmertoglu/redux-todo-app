@@ -34,3 +34,11 @@ export const removeTodoAsync = createAsyncThunk(
     return id;
   }
 );
+
+export const clearCompletedTodosAsync = createAsyncThunk(
+  "todos/clearCompletedTodosAsync",
+  async (data) => {
+    const res = await axios.post("/todos", data);
+    return res.data;
+  }
+);

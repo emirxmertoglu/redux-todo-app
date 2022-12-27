@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   changeActiveFilter,
-  clearCompleted,
   selectTodos,
   selectActiveFilter
 } from "../redux/todos/todosSlice";
+import { clearCompletedTodosAsync } from "../redux/todos/services";
 
 export default function ContentFooter() {
   const dispatch = useDispatch();
@@ -57,7 +57,9 @@ export default function ContentFooter() {
 
       <button
         className="clear-completed"
-        onClick={() => dispatch(clearCompleted())}
+        onClick={() =>
+          dispatch(clearCompletedTodosAsync({ clearCompleted: true }))
+        }
       >
         Clear completed
       </button>

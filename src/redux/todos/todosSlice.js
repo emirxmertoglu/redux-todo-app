@@ -3,7 +3,8 @@ import {
   getTodosAsync,
   addTodoAsync,
   toggleTodoAsync,
-  removeTodoAsync
+  removeTodoAsync,
+  clearCompletedTodosAsync
 } from "./services";
 
 const todosSlice = createSlice({
@@ -21,10 +22,6 @@ const todosSlice = createSlice({
   reducers: {
     changeActiveFilter: (state, action) => {
       state.activeFilter = action.payload;
-    },
-    clearCompleted: (state) => {
-      const filtered = state.items.filter((item) => item.completed === false);
-      state.items = filtered;
     }
   },
   extraReducers: (builder) => {
@@ -67,6 +64,11 @@ const todosSlice = createSlice({
       const filtered = state.items.filter((item) => item.id !== id);
       state.items = filtered;
     });
+
+    // clear completed todos
+    builder.addCase(clearCompletedTodosAsync.fulfilled, (state, action) => {
+      state.items = action.payload;
+    });
   }
 });
 
@@ -84,5 +86,5 @@ export const selectFilteredTodos = (state) => {
 };
 export const selectActiveFilter = (state) => state.todos.activeFilter;
 
-export const { changeActiveFilter, clearCompleted } = todosSlice.actions;
+export const { changeActiveFilter } = todosSlice.actions;
 export default todosSlice.reducer;
