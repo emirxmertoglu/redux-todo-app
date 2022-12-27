@@ -1,49 +1,22 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-
-axios.defaults.baseURL = "https://slycyh-7000.preview.csb.app";
-
-export const getTodosAsync = createAsyncThunk(
-  "todos/getTodosAsync",
-  async () => {
-    const res = await axios("/todos");
-    return res.data;
-  }
-);
-
-export const addTodoAsync = createAsyncThunk(
-  "todos/addTodoAsync",
-  async (data) => {
-    const res = await axios.post("/todos", data);
-    return res.data;
-  }
-);
-
-export const toggleTodoAsync = createAsyncThunk(
-  "todos/toggleTodoAsync",
-  async ({ id, data }) => {
-    const res = await axios.patch(`/todos/${id}`, data);
-    return res.data;
-  }
-);
-
-export const removeTodoAsync = createAsyncThunk(
-  "todos/removeTodoAsync",
-  async (id) => {
-    await axios.delete(`/todos/${id}`);
-    return id;
-  }
-);
+import { createSlice } from "@reduxjs/toolkit";
+import {
+  getTodosAsync,
+  addTodoAsync,
+  toggleTodoAsync,
+  removeTodoAsync
+} from "./services";
 
 const todosSlice = createSlice({
   name: "todos",
   initialState: {
     items: [],
-    activeFilter: "all",
+    activeFilter: localStorage.getItem("activeFilter") || "all",
     isLoading: false,
     error: null,
-    addNewTodoIsLoading: false,
-    addNewTodoError: null
+    addNewTodo: {
+      isLoading: false,
+      error: null
+    }
   },
   reducers: {
     changeActiveFilter: (state, action) => {
@@ -70,15 +43,15 @@ const todosSlice = createSlice({
 
     // add todo
     builder.addCase(addTodoAsync.pending, (state) => {
-      state.addNewTodoIsLoading = true;
+      state.addNewTodo.isLoading = true;
     });
     builder.addCase(addTodoAsync.fulfilled, (state, action) => {
       state.items.push(action.payload);
-      state.addNewTodoIsLoading = false;
+      state.addNewTodo.isLoading = false;
     });
     builder.addCase(addTodoAsync.rejected, (state, action) => {
-      state.addNewTodoError = action.error.message;
-      state.addNewTodoIsLoading = false;
+      state.addNewTodo.error = action.error.message;
+      state.addNewTodo.isLoading = false;
     });
 
     // toggle todo
